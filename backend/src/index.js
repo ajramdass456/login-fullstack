@@ -1,18 +1,22 @@
-// Load environment variables
 import "dotenv/config";
-
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
-import sequelize from './db.js';
-//// import './models/user.js';
+import cookieParser from 'cookie-parser';
+
+import sequelize from './config/db.js';
+import redisClient from './config/redisClient.js'
 
 const PORT = process.env.PORT || 5000;
 const app = express();
 
 // Middleware
-app.use(cors());          // Allows your frontend to connect
-app.use(express.json());  // Allows your server to accept JSON data (like login info)
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000', 
+  credentials: true 
+})); 
+
+app.use(express.json()); 
+app.use(cookieParser());
 
 // Base Test Route
 app.get('/', (req, res) => {
@@ -27,16 +31,12 @@ app.get('/api/test', (req, res) => {
 
 const startServer = async () => {
   try {
-    // Step 1: Test the connection
     await sequelize.authenticate();
     console.log('Database connection established successfully.');
 
-    // Step 2: Build/sync the tables
-    // Use { alter: true } during development so it safely updates tables if you edit your models
-    await sequelize.sync({ alter: true });
+    await sequelize.sync({ alter: true });  //remove alter:true after deployment
     console.log('Database tables synchronized.');
 
-    // Step 3: Start the server only after the DB is fully ready
     app.listen(PORT, () => {
       console.log(`Server is running on http://localhost:${PORT}`);
     });
