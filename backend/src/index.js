@@ -1,4 +1,5 @@
-import "dotenv/config";
+import dotenv from 'dotenv';
+dotenv.config({ path: '../.env' });
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -35,6 +36,7 @@ const startServer = async () => {
     console.log('Database connection established successfully.');
 
     await sequelize.sync({ alter: true });  //remove alter:true after deployment
+    
     console.log('Database tables synchronized.');
 
     app.listen(PORT, () => {
